@@ -1,0 +1,9 @@
+C:\Users\alexc\source\repos\SII\SII\bin\Debug\SII.exe.config
+C:\Users\alexc\source\repos\SII\SII\bin\Debug\SII.exe
+C:\Users\alexc\source\repos\SII\SII\bin\Debug\SII.pdb
+C:\Users\alexc\source\repos\SII\SII\obj\Debug\SII.Form1.resources
+C:\Users\alexc\source\repos\SII\SII\obj\Debug\SII.Properties.Resources.resources
+C:\Users\alexc\source\repos\SII\SII\obj\Debug\SII.csproj.GenerateResource.Cache
+C:\Users\alexc\source\repos\SII\SII\obj\Debug\SII.exe
+C:\Users\alexc\source\repos\SII\SII\obj\Debug\SII.pdb
+C:\Users\alexc\source\repos\SII\SII\obj\Debug\SII.csprojAssemblyReference.cache
