@@ -62,9 +62,9 @@ namespace Test
         static void Main(string[] args)
         {
             double a = 0.9, t = 100, shortPath;
-            int[] path = new int[] { 0, 1, 2, 3, 4, 0 };
-            int[] xs = new int[] { 1, 25, 56, 44, 28, 1 };
-            int[] ys = new int[] { 61, 12, 33, 88, 25, 61 };
+            int[] path = new int[] { 0, 1, 2, 3, 0 };
+            int[] xs = new int[] { 1, 25, 56, 44, 1 };
+            int[] ys = new int[] { 61, 12, 33, 88, 61 };
             List<int[]> arList = new List<int[]>();
             arList.Add(path);
             while (t > 1)

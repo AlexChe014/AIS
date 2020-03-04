@@ -15,8 +15,6 @@ namespace SII
     {
         int clicksMD = 0;
         Point[] points = new Point[11];
-        int[] xs = new int[11];
-        int[] ys = new int[11];
         bool MD = true;
         Graphics g;
         int count;
@@ -47,12 +45,12 @@ namespace SII
             newPath[second] = cont;
             return newPath;
         }
-        public static double fullPath(int[] path, int[] xs, int[] ys)
+        public static double fullPath(int[] path, Point[] points)
         {
             double fullPath = 0;
             for (int i = 1; i < path.Length; i++)
             {
-                fullPath += Way(xs[path[i]], ys[path[i]], xs[path[i - 1]], ys[path[i - 1]]);
+                fullPath += Way(points[path[i]].X, points[path[i]].Y, points[path[i - 1]].X, points[path[i - 1]].Y);
             }
             return fullPath;
         }
@@ -92,6 +90,8 @@ namespace SII
             clicksMD = 0;
             textBox1.Text = "";
             button3.Enabled = true;
+            textBox4.Text = "";
+            Array.Clear(points, 0, points.Length);
         }
 
         private void pictureBox1_MouseDown(object sender, MouseEventArgs e)
@@ -100,8 +100,8 @@ namespace SII
             if (MD == true)
             {
                 Point(e.X, e.Y);
-                xs[clicksMD] = e.X;
-                ys[clicksMD] = e.Y;
+                points[clicksMD].X = e.X;
+                points[clicksMD].Y = e.Y;
                 clicksMD++;
                 if (clicksMD >= count) MD = false;
             }
@@ -120,45 +120,43 @@ namespace SII
             List<int[]> arList = new List<int[]>();
             int[] path = new int[count+1];
             path[0] = 0;
-            xs[count] = xs[0];
-            ys[count] = ys[0];
+            points[count] = points[0];
             path[count] = path[0];
             for (int i = 0; i < count; i++)
-            {
                 path[i] = i;
-            }
+            path = changePath(path);
             arList.Add(path);
             while (t > 1)
             {
-                shortPath = fullPath(path, xs, ys);
+                shortPath = fullPath(path, points);
                 int[] newpath = new int[path.Length];
                 path.CopyTo(newpath, 0);
                 while (!checkList(arList, newpath))
                     newpath = changePath(newpath);
                 arList.Add(newpath);
-                if (fullPath(newpath, xs, ys) <= shortPath)
+                if (fullPath(newpath, points) <= shortPath)
                 {
-                    shortPath = fullPath(newpath, xs, ys);
+                    shortPath = fullPath(newpath, points);
                     path = newpath;
                 }
                 else
                 {
-                    if (checkTemper(fullPath(newpath, xs, ys) - shortPath, t))
+                    if (checkTemper(fullPath(newpath, points) - shortPath, t))
                     {
-                        shortPath = fullPath(newpath, xs, ys);
+                        shortPath = fullPath(newpath, points);
                         path = newpath;
                     }
 
                 }
                 t = a * t;
                 //для вывода промежуточного результата. Можно удалить вместе с textBox
-                textBox1.Text += (fullPath(path, xs, ys) + " > " + t + " ") + Environment.NewLine;
+                textBox1.Text += ($"Parh: {fullPath(path, points):f2} > Temp: {t:f2}") + Environment.NewLine;
                 
             }
-            textBox4.Text = (fullPath(path, xs, ys) + " > " + t + " ") + Environment.NewLine;
+            textBox4.Text = (fullPath(path, points) + " > " + t + " ") + Environment.NewLine;
             for (int i = 1; i < path.Length; i++)
             {
-                g.DrawLine(brush, xs[path[i - 1]], ys[path[i - 1]], xs[path[i]], ys[path[i]]);
+                g.DrawLine(brush, points[path[i - 1]].X, points[path[i - 1]].Y, points[path[i]].X, points[path[i]].Y);
             }
         }
 
@@ -171,11 +169,12 @@ namespace SII
                 int x = rnd.Next(10, pictureBox1.Width-10);
                 int y = rnd.Next(10, pictureBox1.Height-10);
                 Point(x, y);
-                xs[i] = x;
-                ys[i] = y;
+                points[i].X = x;
+                points[i].Y = y;
             }
             button3.Enabled = false;
         }
+
 
         private void textBox2_TextChanged(object sender, EventArgs e)
         {
