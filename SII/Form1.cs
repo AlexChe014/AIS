@@ -13,6 +13,7 @@ namespace SII
     
     public partial class Form1 : Form
     {
+        #region Variables
         int clicksMD = 0;
         Point[] points = new Point[11];
         bool MD = true;
@@ -20,15 +21,20 @@ namespace SII
         int count;
         public Pen brush = new Pen(Color.Black, 3);
         double t, a, shortPath;
+        #endregion
+        #region Functions
+        //поиск расстояния между 2мя точками
         public static double Way(float x1, float y1, float x2, float y2)
         {   
             return Math.Sqrt(Math.Pow((x2 - x1), 2) + Math.Pow((y2 - y1), 2));
         }
+        //нарисовать точку
         private void Point(float x, float y)
         {
             g.DrawEllipse(brush, x, y, brush.Width, brush.Width);
             
         }
+        //изменение последовательности точек
         public static int[] changePath(int[] path)
         {
             Random rnd = new Random();
@@ -45,6 +51,7 @@ namespace SII
             newPath[second] = cont;
             return newPath;
         }
+        //сумма всего пути
         public static double fullPath(int[] path, Point[] points)
         {
             double fullPath = 0;
@@ -54,6 +61,7 @@ namespace SII
             }
             return fullPath;
         }
+        //сравнение P* и случайного числа
         public static bool checkTemper(double s, double t)
         {
             Random rnd = new Random();
@@ -61,6 +69,7 @@ namespace SII
             if (prob > rnd.Next(1, 100)) return true;
             else return false;
         }
+        //проверка повторяющихся последовательностей точек
         public static bool checkList(List<int[]> arList, int[] path)
         {
             bool check = true;
@@ -74,15 +83,15 @@ namespace SII
             }
             return check;
         }
-
+        #endregion
         public Form1()
         {
             InitializeComponent();
             g = pictureBox1.CreateGraphics();
-            count = Convert.ToInt32(numericUpDown1.Value);
-            
+            count = Convert.ToInt32(numericUpDown1.Value);    
         }
 
+        //очитска всех полей, выводящих информацию
         private void button1_Click(object sender, EventArgs e)
         {
             pictureBox1.Refresh();
@@ -93,10 +102,9 @@ namespace SII
             textBox4.Text = "";
             Array.Clear(points, 0, points.Length);
         }
-
+        //расстановка точек вручную
         private void pictureBox1_MouseDown(object sender, MouseEventArgs e)
         {
-            
             if (MD == true)
             {
                 Point(e.X, e.Y);
@@ -107,10 +115,7 @@ namespace SII
             }
         }
 
-        private void numericUpDown1_ValueChanged(object sender, EventArgs e)
-        {
-            count = Convert.ToInt32(numericUpDown1.Value);
-        }
+
 
         private void button2_Click(object sender, EventArgs e)
         {
@@ -153,13 +158,14 @@ namespace SII
                 textBox1.Text += ($"Parh: {fullPath(path, points):f2} > Temp: {t:f2}") + Environment.NewLine;
                 
             }
-            textBox4.Text = (fullPath(path, points) + " > " + t + " ") + Environment.NewLine;
+            textBox4.Text = ($"{fullPath(path, points):f2}") + Environment.NewLine;
             for (int i = 1; i < path.Length; i++)
             {
                 g.DrawLine(brush, points[path[i - 1]].X, points[path[i - 1]].Y, points[path[i]].X, points[path[i]].Y);
             }
         }
 
+        //рандомное расставление точек
         private void button3_Click(object sender, EventArgs e)
         {
             MD = false;
@@ -175,7 +181,7 @@ namespace SII
             button3.Enabled = false;
         }
 
-
+        #region EnterFields
         private void textBox2_TextChanged(object sender, EventArgs e)
         {
             t = Convert.ToDouble(textBox2.Text);
@@ -185,5 +191,10 @@ namespace SII
         {
             a = Convert.ToDouble(textBox3.Text);
         }
+        private void numericUpDown1_ValueChanged(object sender, EventArgs e)
+        {
+            count = Convert.ToInt32(numericUpDown1.Value);
+        }
+        #endregion
     }
 }
