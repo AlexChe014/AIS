@@ -92,7 +92,7 @@ namespace Test
                 Console.WriteLine(fullPath(path, xs, ys) + " > " + t + " ");
                 t = a * t;
             }
-
+            
             Console.ReadKey();
         }
     }

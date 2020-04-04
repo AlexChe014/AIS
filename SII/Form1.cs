@@ -19,8 +19,11 @@ namespace SII
         bool MD = true;
         Graphics g;
         int count;
-        public Pen brush = new Pen(Color.Black, 3);
+        public Pen brush = new Pen(Color.Black, 4);
+        public Pen brush2 = new Pen(Color.Black, 2);
+        public Pen brush3 = new Pen(Color.Red, 2);
         double t, a, shortPath;
+        float A, B, P;
         #endregion
         #region Functions
         //поиск расстояния между 2мя точками
@@ -83,6 +86,85 @@ namespace SII
             }
             return check;
         }
+        //построение маршрута
+        public static int[] buildPath(int count)
+        {
+            int[] path = new int[count + 1];
+            for (int i = 0; i < count; i++)
+                path[i] = i;
+            path[0] = 0;
+            path[path.Length - 1] = path[0];
+            return path;
+        }
+        //функции для муравьиного алгоритма
+        //построение маршрута муравьев
+        public static int[] buildPathAnt(int count)
+        {
+            int[] path = new int[count];
+            for (int i = 0; i < count; i++)
+                path[i] = i;
+            path[0] = 0;
+            path[path.Length - 1] = path[0];
+            return path;
+        }
+        //создание матрицы расстояний
+        public static float[,] distanceMatrix(Point[] points, int count)
+        {
+            float[,] arrPoints = new float[/*points.Length, points.Length*/ count, count];
+            for (int i = 0; i < count; i++)
+                for (int j = 0; j < count; j++)
+                    arrPoints[i, j] = arrPoints[j, i] = (float)Way(points[i].X, points[i].Y, points[j].X, points[j].Y);
+            return arrPoints;
+        }
+        //следующая вершина
+        public static int nextPick(float a, float b, float[,] distances, float[,] pheromones, int[] path, int currentPick)
+        {
+            float[] vars = new float[path.Length];
+            float sum = 0;
+            vars[currentPick] = 0;
+            for (int j = 0; j < vars.Length; j++)
+                if (currentPick != j)
+                    sum += (float)(Math.Pow((1 / distances[currentPick, j]), a) * Math.Pow(pheromones[currentPick, j], b));
+            for (int i = 0; i < vars.Length; i++)
+                if (i != currentPick)
+                    vars[i] = (float)(Math.Pow((1 / distances[i, currentPick]), a) * Math.Pow(pheromones[i, currentPick], b)) / sum;
+            Random rnd = new Random();
+            float y = (float)rnd.NextDouble();
+            sum = vars[0];
+            int answ = 1;
+            for (int i = 1; i < vars.Length; i++)
+            {
+                
+                if (y < sum)
+                {
+                    answ = i;
+                    break;
+                }
+                sum += vars[i];
+            }
+
+            return answ;
+        }
+        //обновление феромонов
+        public static float[,] refreshPheromones(float[,] pheromones, float P, int[] path, float[,] distances)
+        {
+            float[,] newPheromones = pheromones;
+            int k = 0;
+            string check = "";
+            for (int i = 0; i < path.Length; i++)
+                check += path[i].ToString();
+            for (int i = 0; i < pheromones.GetLength(0); i++)
+            {
+                for (int j = 0; j < pheromones.GetLength(1); j++)
+                {
+                    if (check.Contains($"{i}{j}") || check.Contains($"{j}{i}"))
+                        newPheromones[i, j] = (1 - P) * pheromones[i, j] + 1 / distances[i, j];
+                    else newPheromones[i, j] = (1 - P) * newPheromones[i, j];
+                }
+                k++;
+            }
+            return newPheromones;
+        }
         #endregion
         public Form1()
         {
@@ -119,16 +201,12 @@ namespace SII
 
         private void button2_Click(object sender, EventArgs e)
         {
-            count = Convert.ToInt32(numericUpDown1.Value);
             t = Convert.ToDouble(textBox2.Text);
             a = Convert.ToDouble(textBox3.Text);
             List<int[]> arList = new List<int[]>();
-            int[] path = new int[count+1];
-            path[0] = 0;
-            points[count] = points[0];
-            path[count] = path[0];
-            for (int i = 0; i < count; i++)
-                path[i] = i;
+            int[] path = buildPath((int)numericUpDown1.Value);
+            
+            points[path.Length - 1] = points[0];
             path = changePath(path);
             arList.Add(path);
             while (t > 1)
@@ -153,15 +231,14 @@ namespace SII
                     }
 
                 }
-                t = a * t;
-                //для вывода промежуточного результата. Можно удалить вместе с textBox
-                textBox1.Text += ($"Parh: {fullPath(path, points):f2} > Temp: {t:f2}") + Environment.NewLine;
-                
+                t = a * t;          
             }
-            textBox4.Text = ($"{fullPath(path, points):f2}") + Environment.NewLine;
+
+            textBox4.Text += ($"Метод отжига: {fullPath(path, points):f2}") + Environment.NewLine;
+
             for (int i = 1; i < path.Length; i++)
             {
-                g.DrawLine(brush, points[path[i - 1]].X, points[path[i - 1]].Y, points[path[i]].X, points[path[i]].Y);
+                g.DrawLine(brush2, points[path[i - 1]].X, points[path[i - 1]].Y, points[path[i]].X, points[path[i]].Y);
             }
         }
 
@@ -185,6 +262,47 @@ namespace SII
         private void textBox2_TextChanged(object sender, EventArgs e)
         {
             t = Convert.ToDouble(textBox2.Text);
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            A = (float)(numericUpDown2.Value);
+            B = (float)(numericUpDown3.Value);
+            P = (float)Convert.ToDouble(textBox5.Text);
+            float[,] distances = distanceMatrix(points, (int)numericUpDown1.Value);
+            float[,] pheromones = new float[distances.GetLength(0), distances.GetLength(1)];
+            int[] path = buildPathAnt((int)numericUpDown1.Value);
+            for (int i = 0; i < pheromones.GetLength(0); i++)
+            {
+                for (int j = 0; j < pheromones.GetLength(1); j++)
+                    if (j != i)
+                        pheromones[i, j] = 1;
+            }
+
+            int[] new_path = new int[path.Length + 1];
+            new_path[0] = path[0];
+            int next_pick = 0;
+            for (int k = 0; k < (int)numericUpDown6.Value; k++)
+            {
+                for (int i = 0; i < path.Length; i++)
+                    new_path[i] = 0;
+                for (int i = 1; i < path.Length; i++)
+                {
+                    do
+                    {
+                        next_pick = nextPick(A, B, distances, pheromones, path, path[i]);
+                    } while (new_path.Contains(next_pick));
+                    new_path[i] = next_pick;
+                }
+                pheromones = refreshPheromones(pheromones, P, new_path, distances);
+                new_path[new_path.Length - 1] = new_path[0];
+            }
+            for (int i = 1; i < new_path.Length; i++)
+            {
+                g.DrawLine(brush3, points[new_path[i - 1]].X + 1, points[new_path[i - 1]].Y + 1, points[new_path[i]].X + 1, points[new_path[i]].Y + 1);
+            }
+            textBox4.Text += ($"Муравьиный алгоритм: {fullPath(new_path, points):f2}") + Environment.NewLine;
+            
         }
 
         private void textBox3_TextChanged(object sender, EventArgs e)

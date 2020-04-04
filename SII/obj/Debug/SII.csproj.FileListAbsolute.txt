@@ -7,3 +7,4 @@ C:\Users\alexc\source\repos\SII\SII\obj\Debug\SII.csproj.GenerateResource.Cache
 C:\Users\alexc\source\repos\SII\SII\obj\Debug\SII.exe
 C:\Users\alexc\source\repos\SII\SII\obj\Debug\SII.pdb
 C:\Users\alexc\source\repos\SII\SII\obj\Debug\SII.csprojAssemblyReference.cache
+C:\Users\alexc\source\repos\SII\SII\obj\Debug\SII.csproj.CoreCompileInputs.cache
